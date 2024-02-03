@@ -49,14 +49,14 @@ glfw.make_context_current(window)
 
 # Define cube vertices
 vertices = [
-    -0.5, -0.5, -0.5, 1.0, 0.0, 0.0,
-     0.5, -0.5, -0.5, 0.0, 1.0, 0.0,
-     0.5,  0.5, -0.5, 0.0, 0.0, 1.0,
-    -0.5,  0.5, -0.5, 1.0, 1.0, 0.0,
-    -0.5, -0.5,  0.5, 1.0, 0.0, 1.0,
-     0.5, -0.5,  0.5, 0.0, 1.0, 1.0,
-     0.5,  0.5,  0.5, 1.0, 1.0, 1.0,
-    -0.5,  0.5,  0.5, 0.0, 0.0, 0.0
+    -0.5, -0.5, -0.5, 0.0, 0.0, 0.0,  # Black color
+     0.5, -0.5, -0.5, 0.0, 0.0, 0.0,  # Black color
+     0.5,  0.5, -0.5, 0.0, 0.0, 0.0,  # Black color
+    -0.5,  0.5, -0.5, 0.0, 0.0, 0.0,  # Black color
+    -0.5, -0.5,  0.5, 0.0, 0.0, 0.0,  # Black color
+     0.5, -0.5,  0.5, 0.0, 0.0, 0.0,  # Black color
+     0.5,  0.5,  0.5, 0.0, 0.0, 0.0,  # Black color
+    -0.5,  0.5,  0.5, 0.0, 0.0, 0.0   # Black color
 ]
 
 # Define cube indices
@@ -128,7 +128,7 @@ while not glfw.window_should_close(window):
     glfw.poll_events()
 
     # Clear the screen
-    glClearColor(0, 0, 0, 1)
+    glClearColor(1.0, 1.0, 1.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT)
 
     # Generate and pass the rotation matrix to the shader
