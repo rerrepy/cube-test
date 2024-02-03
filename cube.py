@@ -69,8 +69,61 @@ indices = [
     7, 4, 0, 0, 3, 7
 ]
 
+"""
+grid_lines_vertices = [
+    # Vertical lines (x constant, y varies)
+    -1/5, -0.5, -0.5,  1.0, 1.0, 1.0,
+    -1/5,  0.5, -0.5,  1.0, 1.0, 1.0,
+    1/5, -0.5, -0.5,  1.0, 1.0, 1.0,
+    1/5,  0.5, -0.5,  1.0, 1.0, 1.0,
+    
+    # Horizontal lines (y constant, x varies)
+    -0.5, -1/5, -0.5,  1.0, 1.0, 1.0,
+     0.5, -1/5, -0.5,  1.0, 1.0, 1.0,
+    -0.5,  1/5, -0.5,  1.0, 1.0, 1.0,
+     0.5,  1/5, -0.5,  1.0, 1.0, 1.0,
+]
+"""
+
+grid_lines_vertices = [
+    # Vertical lines (x constant, y varies)
+    -1/6, -0.5, -0.5,  1.0, 1.0, 1.0,
+    -1/6,  0.5, -0.5,  1.0, 1.0, 1.0,
+     1/6, -0.5, -0.5,  1.0, 1.0, 1.0,
+     1/6,  0.5, -0.5,  1.0, 1.0, 1.0,
+    
+    # Horizontal lines (y constant, x varies)
+    -0.5, -1/6, -0.5,  1.0, 1.0, 1.0,
+     0.5, -1/6, -0.5,  1.0, 1.0, 1.0,
+    -0.5,  1/6, -0.5,  1.0, 1.0, 1.0,
+     0.5,  1/6, -0.5,  1.0, 1.0, 1.0,
+]
+
+
+grid_lines_vertices = np.array(grid_lines_vertices, dtype=np.float32)
 vertices = np.array(vertices, dtype=np.float32)
 indices = np.array(indices, dtype=np.uint32)
+
+
+
+# Generate and bind VAO and VBO for grid lines (similar to cube setup)
+grid_VAO = glGenVertexArrays(1)
+grid_VBO = glGenBuffers(1)
+glBindVertexArray(grid_VAO)
+glBindBuffer(GL_ARRAY_BUFFER, grid_VBO)
+glBufferData(GL_ARRAY_BUFFER, grid_lines_vertices.nbytes, grid_lines_vertices, GL_STATIC_DRAW)
+
+# Position attribute
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
+glEnableVertexAttribArray(0)
+# Color attribute
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
+glEnableVertexAttribArray(1)
+
+glBindBuffer(GL_ARRAY_BUFFER, 0)
+glBindVertexArray(0)
+
+
 
 # Vertex Buffer Object and Vertex Array Object
 VBO = glGenBuffers(1)
@@ -139,7 +192,10 @@ while not glfw.window_should_close(window):
     # Draw the cube
     glBindVertexArray(VAO)
     glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-
+    glBindVertexArray(grid_VAO)
+    glDrawArrays(GL_LINES, 0, len(grid_lines_vertices) // 6)  # Adjust count based on your vertices
+    glBindVertexArray(0)
+    glLineWidth(2.0)  # Set line width to 2 pixels
     glfw.swap_buffers(window)
 
 
