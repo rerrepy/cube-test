@@ -2,6 +2,7 @@ import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy as np
+import glm
 
 # Initialize glfw
 if not glfw.init():
@@ -9,6 +10,35 @@ if not glfw.init():
 
 # Creating a window
 window = glfw.create_window(640, 480, "PyOpenGL Interactable Cube", None, None)
+
+# Global variables for rotation
+mouse_x_pos, mouse_y_pos = 0, 0
+rotation_x, rotation_y = 0, 0
+
+def mouse_look_callback(window, xpos, ypos):
+    global mouse_x_pos, mouse_y_pos, rotation_x, rotation_y
+    sensitivity = 0.1
+    
+    if glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS:
+        x_offset = xpos - mouse_x_pos
+        y_offset = mouse_y_pos - ypos  # Reversed since y-coordinates range bottom to top
+        rotation_x += x_offset * sensitivity
+        rotation_y += y_offset * sensitivity
+
+    mouse_x_pos, mouse_y_pos = xpos, ypos
+
+def get_rotation_matrix(rotation_x, rotation_y):
+    model = glm.mat4(1.0)  # Create identity matrix
+    model = glm.rotate(model, glm.radians(rotation_x), glm.vec3(0, 1, 0))  # Rotate around the Y axis
+    model = glm.rotate(model, glm.radians(rotation_y), glm.vec3(1, 0, 0))  # Rotate around the X axis
+    return model
+
+
+
+
+glfw.set_cursor_pos_callback(window, mouse_look_callback)
+
+
 
 if not window:
     glfw.terminate()
@@ -69,10 +99,11 @@ vertex_src = """
 # version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
+uniform mat4 model;
 out vec3 ourColor;
 void main()
 {
-   gl_Position = vec4(aPos, 1.0);
+   gl_Position = model * vec4(aPos, 1.0);
    ourColor = aColor;
 }
 """
@@ -96,14 +127,21 @@ glUseProgram(shader)
 while not glfw.window_should_close(window):
     glfw.poll_events()
 
+    # Clear the screen
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT)
 
+    # Generate and pass the rotation matrix to the shader
+    rotation_matrix = get_rotation_matrix(rotation_x, rotation_y)
+    model_loc = glGetUniformLocation(shader, "model")
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm.value_ptr(rotation_matrix))
+
+    # Draw the cube
     glBindVertexArray(VAO)
     glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-    glBindVertexArray(0)
 
     glfw.swap_buffers(window)
+
 
 # Terminate glfw
 glfw.terminate()
